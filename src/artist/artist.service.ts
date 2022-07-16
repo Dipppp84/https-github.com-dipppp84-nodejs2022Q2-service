@@ -3,18 +3,23 @@ import { Artist } from './entities/artist.entity';
 import { checkIdAndEntity } from '../utils/validate';
 import { ArtistDto } from './dto/artist.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { TrackService } from '../track/track.service';
 
+const artistes = new Map<string, Artist>;
 
 @Injectable()
 export class ArtistService {
-  private artistes = new Map<string, Artist>;
+
+  constructor(
+    private trackService: TrackService) {
+  }
 
   getAll(): Artist[] {
-    return Array.from(this.artistes.values());
+    return Array.from(artistes.values());
   }
 
   getById(id: string): Artist {
-    return checkIdAndEntity<Artist>(id, this.artistes);
+    return checkIdAndEntity<Artist>(id, artistes);
   }
 
   create(createArtist: ArtistDto): Artist {
@@ -23,20 +28,26 @@ export class ArtistService {
       name: createArtist.name,
       grammy: createArtist.grammy,
     };
-    this.artistes.set(artist.id, artist);
+    artistes.set(artist.id, artist);
     return artist;
   }
 
   update(id: string, updateArtist: ArtistDto): Artist {
-    const artist = checkIdAndEntity<Artist>(id, this.artistes);
+    const artist = checkIdAndEntity<Artist>(id, artistes);
     artist.name = updateArtist.name;
     artist.grammy = updateArtist.grammy;
     return artist;
   }
 
   remove(id: string) {
-    //todo should set track.artistId and track.albumId to null after deletion
-    checkIdAndEntity<Artist>(id, this.artistes);
-    this.artistes.delete(id);
+    const tracks = this.trackService.getAll();
+    const track = tracks.find(value => value.artistId === id);
+    if (track) {
+      track.artistId = null;
+      track.albumId = null;
+    }
+
+    checkIdAndEntity<Artist>(id, artistes);
+    artistes.delete(id);
   }
 }
