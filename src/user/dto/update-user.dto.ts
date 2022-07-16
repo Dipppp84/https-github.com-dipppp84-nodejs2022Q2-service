@@ -1,4 +1,10 @@
-export interface UpdateUserDto {
+import { IsNotEmpty, IsString } from 'class-validator';
+
+export class UpdateUserDto {
+  @IsNotEmpty()
+  @IsString()
   oldPassword: string;
-  newPassword: string
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
 }
