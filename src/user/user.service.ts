@@ -16,7 +16,7 @@ export class UserService {
   }
 
   getById(id: string): User {
-    return checkIdAndEntity(id, this.users);
+    return checkIdAndEntity<User>(id, this.users);
   }
 
   create(createUser: CreateUserDto): User {
@@ -35,7 +35,7 @@ export class UserService {
   }
 
   update(id: string, updateUser: UpdateUserDto): User {
-    const user = checkIdAndEntity(id, this.users);
+    const user = checkIdAndEntity<User>(id, this.users);
     if (user.password === updateUser.oldPassword)
       user.password = updateUser.newPassword;
     else sendForbidden('oldPassword is wrong');
@@ -45,7 +45,7 @@ export class UserService {
   }
 
   remove(id: string) {
-    checkIdAndEntity(id, this.users);
+    checkIdAndEntity<User>(id, this.users);
     this.users.delete(id);
   }
 
