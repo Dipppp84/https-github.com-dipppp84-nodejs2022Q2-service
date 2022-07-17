@@ -1,17 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TrackService } from '../track/track.service';
 import { checkIdAndEntity } from '../utils/validate';
 import { v4 as uuidv4 } from 'uuid';
 import { Album } from './entities/album.entity';
 import { AlbumDto } from './dto/album.dto';
+import { FavoriteService } from '../favorite/favorite.service';
+import { ArtistService } from '../artist/artist.service';
 
 const albums = new Map<string, Album>;
 
 @Injectable()
 export class AlbumService {
 
-  constructor(
-    private trackService: TrackService) {
+  constructor(@Inject(forwardRef(() => FavoriteService))
+              private trackService: TrackService,
+              @Inject(forwardRef(() => FavoriteService))
+              private favoriteService: FavoriteService,
+              @Inject(forwardRef(() => ArtistService))
+              private artistService: ArtistService) {
   }
 
   getAll(): Album[] {
@@ -42,12 +48,14 @@ export class AlbumService {
   }
 
   remove(id: string) {
-     const tracks = this.trackService.getAll();
-     const track = tracks.find(value => value.albumId === id);
-     if (track) {
-       track.artistId = null;
-       track.albumId = null;
-     }
+    const tracks = this.trackService.getAll();
+    const track = tracks.find(value => value.albumId === id);
+    if (track) {
+      track.artistId = null;
+      track.albumId = null;
+    }
+
+    this.favoriteService.simpleRemoveAlbum(id);
 
     checkIdAndEntity<Album>(id, albums);
     albums.delete(id);

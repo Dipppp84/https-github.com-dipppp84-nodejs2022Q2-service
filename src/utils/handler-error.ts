@@ -23,3 +23,11 @@ export function sendForbidden(message: string): void {
     error: message,
   }, HttpStatus.FORBIDDEN);
 }
+
+/**status code 422*/
+export function sendUnprocessableEntity(message: string): void {
+  throw new HttpException({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    error: message,
+  }, HttpStatus.UNPROCESSABLE_ENTITY);
+}
