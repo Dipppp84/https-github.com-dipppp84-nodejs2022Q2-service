@@ -2,7 +2,7 @@ import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post } from '@nes
 import { FavoriteService } from './favorite.service';
 import { FavoriteDto } from './dto/favorite.dto';
 
-@Controller('fav')
+@Controller('favs')
 export class FavoriteController {
   constructor(private favoriteService: FavoriteService) {
   }

@@ -12,7 +12,7 @@ const albums = new Map<string, Album>;
 @Injectable()
 export class AlbumService {
 
-  constructor(@Inject(forwardRef(() => FavoriteService))
+  constructor(@Inject(forwardRef(() => TrackService))
               private trackService: TrackService,
               @Inject(forwardRef(() => FavoriteService))
               private favoriteService: FavoriteService,

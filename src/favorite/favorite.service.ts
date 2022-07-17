@@ -14,13 +14,12 @@ const favorite = new Favorite();
 
 @Injectable()
 export class FavoriteService {
-  constructor(
-    @Inject(forwardRef(() => TrackService))
-    private trackService: TrackService,
-    @Inject(forwardRef(() => AlbumService))
-    private albumService: AlbumService,
-    @Inject(forwardRef(() => ArtistService))
-    private artistService: ArtistService) {
+  constructor(@Inject(forwardRef(() => TrackService))
+              private trackService: TrackService,
+              @Inject(forwardRef(() => AlbumService))
+              private albumService: AlbumService,
+              @Inject(forwardRef(() => ArtistService))
+              private artistService: ArtistService) {
   }
 
   getAll(): FavoriteDto {
@@ -37,6 +36,7 @@ export class FavoriteService {
     } catch (e) {
       if (e.status === HttpStatus.NOT_FOUND)
         sendUnprocessableEntity('trackId doesn\'t exist');
+      else throw e;
     }
     favorite.tracks.push(id);
   }
@@ -52,6 +52,7 @@ export class FavoriteService {
     } catch (e) {
       if (e.status === HttpStatus.NOT_FOUND)
         sendUnprocessableEntity('artistId doesn\'t exist');
+      else throw e;
     }
     favorite.artists.push(id);
   }
@@ -67,6 +68,7 @@ export class FavoriteService {
     } catch (e) {
       if (e.status === HttpStatus.NOT_FOUND)
         sendUnprocessableEntity('albumsId doesn\'t exist');
+      else throw e;
     }
     favorite.albums.push(id);
   }
