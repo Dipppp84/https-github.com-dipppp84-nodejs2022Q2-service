@@ -58,13 +58,3 @@ To run only specific test suite with authorization
 ```
 npm run test:auth -- <path to suite>
 ```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
