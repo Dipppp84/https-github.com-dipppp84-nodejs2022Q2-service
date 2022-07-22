@@ -1,0 +1,8 @@
+db
+node_modules
+package-lock.json
+.git
+.idea
+docker-compose.yml
+Dockerfile
+Makefile

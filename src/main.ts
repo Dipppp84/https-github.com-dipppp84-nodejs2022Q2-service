@@ -9,12 +9,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Home Library Service')
+    .setTitle('!Home Library Service')
     .setDescription('Home music library service')
     .setVersion('1.0')
-/*
-    .addTag('Favorites')
-*/
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);

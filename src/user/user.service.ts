@@ -22,13 +22,14 @@ export class UserService {
   create(createUser: CreateUserDto): User {
     if (!createUser.login || !createUser.password)
       sendBadRequest('body does not contain required fields');
+    const date = Date.now();
     const user: User = new User({
       id: uuidv4(),
       login: createUser.login,
       password: createUser.password,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: date,
+      updatedAt: date,
     });
     this.users.set(user.id, user);
     return user;
@@ -48,7 +49,6 @@ export class UserService {
     checkIdAndEntity<User>(id, this.users);
     this.users.delete(id);
   }
-
 }
 
 

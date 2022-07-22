@@ -59,12 +59,36 @@ To run only specific test suite with authorization
 npm run test:auth -- <path to suite>
 ```
 
-### Auto-fix and format
+## Containerization, Docker
 
+### Running application and postgres as docker
+1. Install [Docker](https://docs.docker.com/engine/install/)
+
+2. You need to add this project to Sharing configuration in your Docker
 ```
-npm run lint
+Docker->Setting->Resources->File sharing->add<this project>
+```
+3. To run 
+```
+docker-compose up
+```
+4. To stop
+```
+docker-compose down
 ```
 
+### Running only application as docker
+To run for cmd
 ```
-npm run format
+docker run -p 4000:4000 -v %cd%/src:/node/app/src --rm dipppp84/rest_service:v1
+```
+To run for bash
+```
+docker run -p 4000:4000 -v "$(pwd)/src:/node/app/src" --rm dipppp84/rest_service:v1
+```
+
+### Running only postgres as docker
+To run
+```
+docker run -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=rest -e PGDATA=/var/lib/postgresql/data/pgdata -v pgdata:/var/lib/postgresql/data --rm dipppp84/rest_db:v1
 ```
