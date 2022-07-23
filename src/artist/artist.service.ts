@@ -1,13 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Artist } from './entities/artist.entity';
-import { checkIdAndEntityOld } from '../utils/validate';
+import { checkId, checkIdAndEntityOld } from '../utils/validate';
 import { ArtistDto } from './dto/artist.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackService } from '../track/track.service';
 import { FavoriteService } from '../favorite/favorite.service';
 import { AlbumService } from '../album/album.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { sendNotFound } from '../utils/handler-error';
 
-const artistes = new Map<string, Artist>;
+//const artistes = new Map<string, Artist>;
 
 @Injectable()
 export class ArtistService {
@@ -17,51 +21,54 @@ export class ArtistService {
               @Inject(forwardRef(() => FavoriteService))
               private favoriteService: FavoriteService,
               @Inject(forwardRef(() => AlbumService))
-              private albumService: AlbumService) {
+              private albumService: AlbumService,
+              @InjectRepository(User)
+              private artistRepository: Repository<Artist>) {
   }
 
-  getAll(): Artist[] {
-    return Array.from(artistes.values());
+  async getAll(): Promise<Artist[]> {
+    return this.artistRepository.find();
   }
 
-  getById(id: string): Artist {
-    return checkIdAndEntityOld<Artist>(id, artistes);
+  async getById(id: string): Promise<Artist> {
+    checkId(id);
+    const artist = await this.artistRepository.findOneBy({ id });
+    if (!artist)
+      sendNotFound('Id doesn\'t exist');
+    return artist;
   }
 
-  create(createArtist: ArtistDto): Artist {
+  async create(createArtist: ArtistDto): Promise<Artist> {
     const artist: Artist = {
-      id: uuidv4(),
+      id: '',
       name: createArtist.name,
       grammy: createArtist.grammy,
     };
-    artistes.set(artist.id, artist);
-    return artist;
+    return this.artistRepository.save(artist);
   }
 
-  update(id: string, updateArtist: ArtistDto): Artist {
-    const artist = checkIdAndEntityOld<Artist>(id, artistes);
+  async update(id: string, updateArtist: ArtistDto): Promise<Artist> {
+    checkId(id);
+    const artist = await this.artistRepository.findOneBy({ id });
+    if (!artist)
+      sendNotFound('Id doesn\'t exist');
+
     artist.name = updateArtist.name;
     artist.grammy = updateArtist.grammy;
-    return artist;
+    return this.artistRepository.save(artist);
   }
 
-  remove(id: string) {
-    const tracks = this.trackService.getAll();
-    const track = tracks.find(value => value.artistId === id);
-    if (track) {
-      track.artistId = null;
-      track.albumId = null;
-    }
+  async remove(id: string): Promise<any> {
+    checkId(id);
+    const artist = await this.artistRepository.findOneBy({ id });
+    if (!artist)
+      sendNotFound('Id doesn\'t exist');
 
-    const albums = this.albumService.getAll();
-    const album = albums.find(value => value.artistId === id);
-    if (album) {
-      album.artistId = null;
-    }
+    await Promise.all([
+      this.trackService.simpleRemoveArtisAndAlbum(id),
+      this.albumService.simpleRemoveArtis(id),
+      this.favoriteService.simpleRemoveArtist(id)]);
 
-    this.favoriteService.simpleRemoveArtist(id);
-
-    checkIdAndEntityOld<Artist>(id, artistes);
-    artistes.delete(id);
+    return this.artistRepository.delete(id);
   }
 }

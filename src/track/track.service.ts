@@ -48,4 +48,9 @@ export class TrackService {
     checkIdAndEntityOld<Track>(id, tracks);
     tracks.delete(id);
   }
+
+  async simpleRemoveArtisAndAlbum(id: string){
+    //todo delete ArtistID and AlbumID
+  }
+
 }

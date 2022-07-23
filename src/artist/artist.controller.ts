@@ -13,7 +13,7 @@ export class ArtistController {
   @Get()
   @ApiOperation({ summary: 'Get artist list' })
   @ApiResponse({ status: 200, description: 'Successful operation', type: [Artist] })
-  getAll(): Artist[] {
+  getAll(): Promise<Artist[]> {
     return this.artistService.getAll();
   }
 
@@ -22,7 +22,7 @@ export class ArtistController {
   @ApiResponse({ status: 200, description: 'Successful operation', type: Artist })
   @ApiResponse({ status: 400, description: 'Bad request. artistId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Artist was not found' })
-  getById(@Param('id') id: string): Artist {
+  getById(@Param('id') id: string): Promise<Artist> {
     return this.artistService.getById(id);
   }
 
@@ -31,7 +31,7 @@ export class ArtistController {
   @ApiResponse({ status: 201, description: 'Artist is created', type: Artist })
   @ApiResponse({ status: 400, description: 'Bad request. body does not contain required fields' })
   @ApiBody({ type: ArtistDto })
-  creat(@Body() createArtist: ArtistDto): Artist {
+  creat(@Body() createArtist: ArtistDto): Promise<Artist> {
     return this.artistService.create(createArtist);
   }
 
@@ -41,7 +41,7 @@ export class ArtistController {
   @ApiResponse({ status: 400, description: 'Bad request. artistId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Artist was not found' })
   @ApiBody({ type: ArtistDto })
-  update(@Param('id') id: string, @Body() updateArtist: ArtistDto): Artist {
+  update(@Param('id') id: string, @Body() updateArtist: ArtistDto): Promise<Artist> {
     return this.artistService.update(id, updateArtist);
   }
 
@@ -51,7 +51,7 @@ export class ArtistController {
   @ApiResponse({ status: 204, description: 'Deleted successfully' })
   @ApiResponse({ status: 400, description: 'Bad request. artistId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Artist was not found' })
-  remove(@Param('id') id: string) {
-    this.artistService.remove(id);
+  remove(@Param('id') id: string): Promise<any> {
+    return this.artistService.remove(id);
   }
 }

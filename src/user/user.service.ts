@@ -22,7 +22,7 @@ export class UserService {
     const user = await this.usersRepository.findOneBy({id});
     if (!user)
       sendNotFound('Id doesn\'t exist');
-    return this.usersRepository.findOneBy({id});
+    return user;
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -50,9 +50,10 @@ export class UserService {
     else sendForbidden('oldPassword is wrong');
     user.version += 1;
     user.updatedAt = Date.now();
+
     const save = await this.usersRepository.save(user);
     save.createdAt = Number(save.createdAt);//Костыль, save возвращает bigDate как строку
-    return save
+    return save;
   }
 
   async remove(id: string): Promise<any> {
@@ -60,7 +61,7 @@ export class UserService {
     const user = await this.usersRepository.findOneBy({id});
     if (!user)
       sendNotFound('Id doesn\'t exist');
-    return this.usersRepository.delete(id)
+    return this.usersRepository.delete(id);
   }
 }
 
