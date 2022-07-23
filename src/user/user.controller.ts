@@ -27,7 +27,7 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: 'Get user list' })
   @ApiResponse({ status: 200, description: 'Successful operation', type: [User] })
-  getAll(): User[] {
+  getAll(): Promise<User[]> {
     return this.userService.getAll();
   }
 
@@ -37,7 +37,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Successful operation', type: User })
   @ApiResponse({ status: 400, description: 'Bad request. userId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Track was not found' })
-  getById(@Param('id') id: string): User {
+  getById(@Param('id') id: string): Promise<User> {
     return this.userService.getById(id);
   }
 
@@ -47,7 +47,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'Track is created', type: User })
   @ApiResponse({ status: 400, description: 'Bad request. body does not contain required fields' })
   @ApiBody({ type: CreateUserDto })
-  creat(@Body() createUser: CreateUserDto) {
+  creat(@Body() createUser: CreateUserDto): Promise<User>{
     return this.userService.create(createUser);
   }
 
@@ -58,7 +58,7 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Bad request. userId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Track was not found' })
   @ApiBody({ type: UpdateUserDto })
-  update(@Param('id') id: string, @Body() updateUser: UpdateUserDto): User {
+  update(@Param('id') id: string, @Body() updateUser: UpdateUserDto): Promise<User> {
     return this.userService.update(id, updateUser);
   }
 
@@ -68,7 +68,7 @@ export class UserController {
   @ApiResponse({ status: 204, description: 'Deleted successfully' })
   @ApiResponse({ status: 400, description: 'Bad request. userId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Track was not found' })
-  remove(@Param('id') id: string) {
-    this.userService.remove(id);
+  remove(@Param('id') id: string): Promise<any>{
+    return this.userService.remove(id);
   }
 }

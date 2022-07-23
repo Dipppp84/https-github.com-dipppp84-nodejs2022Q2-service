@@ -1,53 +1,66 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { sendBadRequest, sendForbidden } from '../utils/handler-error';
-import { checkIdAndEntity } from '../utils/validate';
+import { sendBadRequest, sendForbidden, sendNotFound } from '../utils/handler-error';
+import { checkId } from '../utils/validate';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-
-  private users = new Map<string, User>();
-
-  getAll(): User[] {
-    return Array.from(this.users.values());
+  constructor(@InjectRepository(User)
+              private usersRepository: Repository<User>) {
   }
 
-  getById(id: string): User {
-    return checkIdAndEntity<User>(id, this.users);
+  async getAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
-  create(createUser: CreateUserDto): User {
-    if (!createUser.login || !createUser.password)
+  async getById(id: string): Promise<User> {
+    checkId(id);
+    const user = await this.usersRepository.findOneBy({id});
+    if (!user)
+      sendNotFound('Id doesn\'t exist');
+    return this.usersRepository.findOneBy({id});
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    if (!createUserDto.login || !createUserDto.password)
       sendBadRequest('body does not contain required fields');
     const date = Date.now();
-    const user: User = new User({
-      id: uuidv4(),
-      login: createUser.login,
-      password: createUser.password,
+    const createUser: User = new User({
+      login: createUserDto.login,
+      password: createUserDto.password,
       version: 1,
       createdAt: date,
       updatedAt: date,
     });
-    this.users.set(user.id, user);
-    return user;
+    return this.usersRepository.save(createUser);
   }
 
-  update(id: string, updateUser: UpdateUserDto): User {
-    const user = checkIdAndEntity<User>(id, this.users);
+  async update(id: string, updateUser: UpdateUserDto): Promise<User> {
+    checkId(id);
+    const user = await this.usersRepository.findOneBy({id});
+    if (!user)
+      sendNotFound('Id doesn\'t exist');
+
     if (user.password === updateUser.oldPassword)
       user.password = updateUser.newPassword;
     else sendForbidden('oldPassword is wrong');
     user.version += 1;
     user.updatedAt = Date.now();
-    return user;
+    const save = await this.usersRepository.save(user);
+    save.createdAt = Number(save.createdAt);//Костыль, save возвращает bigDate как строку
+    return save
   }
 
-  remove(id: string) {
-    checkIdAndEntity<User>(id, this.users);
-    this.users.delete(id);
+  async remove(id: string): Promise<any> {
+    checkId(id);
+    const user = await this.usersRepository.findOneBy({id});
+    if (!user)
+      sendNotFound('Id doesn\'t exist');
+    return this.usersRepository.delete(id)
   }
 }
 

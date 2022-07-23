@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TrackService } from '../track/track.service';
-import { checkIdAndEntity } from '../utils/validate';
+import { checkIdAndEntityOld } from '../utils/validate';
 import { v4 as uuidv4 } from 'uuid';
 import { Album } from './entities/album.entity';
 import { AlbumDto } from './dto/album.dto';
@@ -25,7 +25,7 @@ export class AlbumService {
   }
 
   getById(id: string): Album {
-    return checkIdAndEntity<Album>(id, albums);
+    return checkIdAndEntityOld<Album>(id, albums);
   }
 
   create(createAlbum: AlbumDto): Album {
@@ -40,7 +40,7 @@ export class AlbumService {
   }
 
   update(id: string, updateAlbum: AlbumDto): Album {
-    const album = checkIdAndEntity<Album>(id, albums);
+    const album = checkIdAndEntityOld<Album>(id, albums);
     album.name = updateAlbum.name;
     album.year = updateAlbum.year;
     album.artistId = updateAlbum.artistId;
@@ -57,7 +57,7 @@ export class AlbumService {
 
     this.favoriteService.simpleRemoveAlbum(id);
 
-    checkIdAndEntity<Album>(id, albums);
+    checkIdAndEntityOld<Album>(id, albums);
     albums.delete(id);
   }
 }
