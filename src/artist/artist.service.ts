@@ -1,17 +1,13 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Artist } from './entities/artist.entity';
-import { checkId, checkIdAndEntityOld } from '../utils/validate';
+import { checkId } from '../utils/validate';
 import { ArtistDto } from './dto/artist.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { TrackService } from '../track/track.service';
 import { FavoriteService } from '../favorite/favorite.service';
 import { AlbumService } from '../album/album.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { sendNotFound } from '../utils/handler-error';
-
-//const artistes = new Map<string, Artist>;
 
 @Injectable()
 export class ArtistService {
@@ -22,7 +18,7 @@ export class ArtistService {
               private favoriteService: FavoriteService,
               @Inject(forwardRef(() => AlbumService))
               private albumService: AlbumService,
-              @InjectRepository(User)
+              @InjectRepository(Artist)
               private artistRepository: Repository<Artist>) {
   }
 
@@ -39,11 +35,7 @@ export class ArtistService {
   }
 
   async create(createArtist: ArtistDto): Promise<Artist> {
-    const artist: Artist = {
-      id: '',
-      name: createArtist.name,
-      grammy: createArtist.grammy,
-    };
+    const artist = new Artist(createArtist.name, createArtist.grammy);
     return this.artistRepository.save(artist);
   }
 
@@ -63,11 +55,6 @@ export class ArtistService {
     const artist = await this.artistRepository.findOneBy({ id });
     if (!artist)
       sendNotFound('Id doesn\'t exist');
-
-    await Promise.all([
-      this.trackService.simpleRemoveArtisAndAlbum(id),
-      this.albumService.simpleRemoveArtis(id),
-      this.favoriteService.simpleRemoveArtist(id)]);
 
     return this.artistRepository.delete(id);
   }

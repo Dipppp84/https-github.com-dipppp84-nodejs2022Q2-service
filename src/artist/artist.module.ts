@@ -12,7 +12,7 @@ import { Artist } from './entities/artist.entity';
     forwardRef(() => AlbumModule),
     forwardRef(() => TrackModule),
     forwardRef(() => FavoriteModule),
-    TypeOrmModule.forFeature([Artist])
+    TypeOrmModule.forFeature([Artist]),
   ],
   providers: [ArtistService],
   controllers: [ArtistController],

@@ -4,6 +4,11 @@ import { Album } from '../../album/entities/album.entity';
 
 @Entity()
 export class Artist {
+  constructor(name: string, grammy: boolean = false) {
+    this.name = name;
+    this.grammy = grammy;
+  }
+
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -13,6 +18,6 @@ export class Artist {
   @ApiProperty()
   @Column({ type: 'boolean', default: false })
   grammy: boolean;
-  @OneToMany(() => Album, (album: Album) => album.artistId)
-  albums: Album[];
+/*  @OneToMany(() => Album, (album: Album) => album.artist, { cascade: true })
+  albums: Album[];*/
 }

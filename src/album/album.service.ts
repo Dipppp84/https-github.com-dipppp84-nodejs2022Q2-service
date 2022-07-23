@@ -1,13 +1,15 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TrackService } from '../track/track.service';
-import { checkIdAndEntityOld } from '../utils/validate';
-import { v4 as uuidv4 } from 'uuid';
-import { Album } from './entities/album.entity';
+import { checkId } from '../utils/validate';
 import { AlbumDto } from './dto/album.dto';
 import { FavoriteService } from '../favorite/favorite.service';
 import { ArtistService } from '../artist/artist.service';
-
-const albums = new Map<string, Album>;
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Artist } from '../artist/entities/artist.entity';
+import { sendNotFound } from '../utils/handler-error';
+import { Album } from './entities/album.entity';
+import { AlbumResponseDto } from './dto/album.response.dto';
 
 @Injectable()
 export class AlbumService {
@@ -17,47 +19,68 @@ export class AlbumService {
               @Inject(forwardRef(() => FavoriteService))
               private favoriteService: FavoriteService,
               @Inject(forwardRef(() => ArtistService))
-              private artistService: ArtistService) {
+              private artistService: ArtistService,
+              @InjectRepository(Album)
+              private albumRepository: Repository<Album>) {
   }
 
-  getAll(): Album[] {
-    return Array.from(albums.values());
+  async getAll(): Promise<AlbumResponseDto[]> {
+    const all = await this.albumRepository.find({loadRelationIds: true});
+    return all.map(album => album.toResponse());
   }
 
-  getById(id: string): Album {
-    return checkIdAndEntityOld<Album>(id, albums);
+  async getById(id: string): Promise<AlbumResponseDto> {
+    checkId(id);
+    const album = await this.albumRepository.findOne({ where: { id: id },
+      loadRelationIds: true });
+    if (!album)
+      sendNotFound('Id doesn\'t exist');
+    return album.toResponse();
   }
 
-  create(createAlbum: AlbumDto): Album {
-    const album: Album = {
-      id: uuidv4(),
-      name: createAlbum.name,
-      year: createAlbum.year,
-      artistId: createAlbum.artistId,
-    };
-    albums.set(album.id, album);
-    return album;
+  async create({ artistId, name, year }: AlbumDto): Promise<AlbumResponseDto> {
+    let artist: Artist = null;
+    if (artistId)
+      artist = await this.artistService.getById(artistId);
+
+    const album = new Album(name, year, artist);
+    return (await this.albumRepository.save(album)).toResponse();
   }
 
-  update(id: string, updateAlbum: AlbumDto): Album {
-    const album = checkIdAndEntityOld<Album>(id, albums);
-    album.name = updateAlbum.name;
-    album.year = updateAlbum.year;
-    album.artistId = updateAlbum.artistId;
-    return album;
+  async update(id: string, { artistId, name, year }: AlbumDto): Promise<AlbumResponseDto> {
+    checkId(id);
+    const album = await this.albumRepository.findOneBy({ id });
+    if (!album)
+      sendNotFound('Id doesn\'t exist');
+
+    let artist: Artist = null;
+    if (artistId)
+      artist = await this.artistService.getById(artistId);
+
+    album.name = name;
+    album.year = year;
+    album.artist = artist;
+    return (await this.albumRepository.save(album)).toResponse();
   }
 
-  remove(id: string) {
-    const tracks = this.trackService.getAll();
-    const track = tracks.find(value => value.albumId === id);
-    if (track) {
-      track.artistId = null;
-      track.albumId = null;
-    }
-
-    this.favoriteService.simpleRemoveAlbum(id);
-
-    checkIdAndEntityOld<Album>(id, albums);
-    albums.delete(id);
+  async remove(id: string): Promise<any> {
+    checkId(id);
+    const album = await this.albumRepository.findOneBy({ id });
+    if (!album)
+      sendNotFound('Id doesn\'t exist');
+    /*    const tracks = this.trackService.getAll();
+        const track = tracks.find(value => value.albumId === id);
+        if (track) {
+          track.artistId = null;
+          track.albumId = null;
+        }*/
+    /*
+        this.favoriteService.simpleRemoveAlbum(id);
+    */
+    return this.albumRepository.delete(id);
   }
+
+  /*  async simpleRemoveArtis(id: string) {
+      //todo delete ArtistID and AlbumID
+    }*/
 }

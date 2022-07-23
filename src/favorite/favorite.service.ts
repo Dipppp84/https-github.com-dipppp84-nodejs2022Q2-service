@@ -23,11 +23,12 @@ export class FavoriteService {
   }
 
   getAll(): FavoriteDto {
-    return {
+    /*return {
       albums: favorite.albums.map<Album>(id => this.albumService.getById(id)),
       artists: favorite.artists.map<Artist>(id => this.artistService.getById(id)),
       tracks: favorite.tracks.map<Track>(id => this.trackService.getById(id)),
-    };
+    };*/
+    return null
   }
 
   setTrack(id: string) {
