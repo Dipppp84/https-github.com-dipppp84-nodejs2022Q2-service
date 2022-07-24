@@ -1,56 +1,83 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { checkIdAndEntityOld } from '../utils/validate';
-import { v4 as uuidv4 } from 'uuid';
 import { Track } from './entities/track.entity';
 import { TrackDto } from './dto/track.dto';
 import { FavoriteService } from '../favorite/favorite.service';
-
-const tracks = new Map<string, Track>;
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { checkId } from '../utils/validate';
+import { sendNotFound } from '../utils/handler-error';
+import { Artist } from '../artist/entities/artist.entity';
+import { Album } from '../album/entities/album.entity';
+import { ArtistService } from '../artist/artist.service';
+import { AlbumService } from '../album/album.service';
 
 @Injectable()
 export class TrackService {
   constructor(@Inject(forwardRef(() => FavoriteService))
-              private favoriteService: FavoriteService) {
-  }
-  getAll(): Track[] {
-    return Array.from(tracks.values());
+              private favoriteService: FavoriteService,
+              @Inject(forwardRef(() => ArtistService))
+              private artistService: ArtistService,
+              @Inject(forwardRef(() => AlbumService))
+              private albumService: AlbumService,
+              @InjectRepository(Track)
+              private trackRepository: Repository<Track>) {
   }
 
-  getById(id: string): Track {
-    return checkIdAndEntityOld<Track>(id, tracks);
+  async getAll(): Promise<Track[]> {
+    const all = await this.trackRepository.find({ loadRelationIds: true });
+    return all.map(track => track);
   }
 
-  create(createTrack: TrackDto): Track {
-    const track: Track = {
-      id: uuidv4(),
-      name: createTrack.name,
-      artistId: createTrack.artistId,
-      albumId: createTrack.albumId,
-      duration: createTrack.duration,
-    };
-    tracks.set(track.id, track);
+  async getById(id: string): Promise<Track> {
+    checkId(id);
+    const track = await this.trackRepository.findOne({
+      where: { id: id },
+      loadRelationIds: true,
+    });
+    if (!track)
+      sendNotFound('Id doesn\'t exist');
     return track;
   }
 
-  update(id: string, updateTrack: TrackDto): Track {
-    const track = checkIdAndEntityOld<Track>(id, tracks);
+  async create({ albumId, artistId, duration, name }: TrackDto): Promise<Track> {
+    let album: Album = null;
+    if (albumId)
+      album = await this.albumService.getById(albumId);
 
-    track.name = updateTrack.name;
-    track.artistId = updateTrack.artistId;
-    track.albumId = updateTrack.albumId;
-    track.duration = updateTrack.duration;
-    return track;
+    let artist: Artist = null;
+    if (artistId)
+      artist = await this.artistService.getById(artistId);
+
+    const track = new Track(name, duration, artist, album);
+    return this.trackRepository.save(track);
   }
 
-  remove(id: string) {
-    this.favoriteService.simpleRemoveTrack(id);
+  async update(id: string, { albumId, artistId, duration, name }: TrackDto): Promise<Track> {
+    checkId(id);
+    const track = await this.trackRepository.findOneBy({ id });
+    if (!track)
+      sendNotFound('Id doesn\'t exist');
 
-    checkIdAndEntityOld<Track>(id, tracks);
-    tracks.delete(id);
+    let album: Album = null;
+    if (albumId)
+      album = await this.albumService.getById(albumId);
+
+    let artist: Artist = null;
+    if (artistId)
+      artist = await this.artistService.getById(artistId);
+
+    track.name = name;
+    track.artist = artist;
+    track.album = album;
+    track.duration = duration;
+    return this.trackRepository.save(track);
   }
 
-  async simpleRemoveArtisAndAlbum(id: string){
-    //todo delete ArtistID and AlbumID
+  async remove(id: string): Promise<any> {
+    checkId(id);
+    const track = await this.trackRepository.findOneBy({ id });
+    if (!track)
+      sendNotFound('Id doesn\'t exist');
+    return this.trackRepository.delete(id);
   }
-
 }

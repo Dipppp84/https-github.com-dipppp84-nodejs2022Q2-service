@@ -14,8 +14,9 @@ export class AlbumController {
   @Get()
   @ApiOperation({ summary: 'Get albums list' })
   @ApiResponse({ status: 200, description: 'Successful operation', type: [AlbumResponseDto] })
-  getAll(): Promise<AlbumResponseDto[]> {
-    return this.albumService.getAll();
+  async getAll(): Promise<AlbumResponseDto[]> {
+    const all = await this.albumService.getAll();
+    return all.map(album => album.toResponse());
   }
 
   @Get(':id')
@@ -23,8 +24,8 @@ export class AlbumController {
   @ApiResponse({ status: 200, description: 'Successful operation', type: AlbumResponseDto })
   @ApiResponse({ status: 400, description: 'Bad request. albumId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Album was not found' })
-  getById(@Param('id') id: string): Promise<AlbumResponseDto> {
-    return this.albumService.getById(id);
+  async getById(@Param('id') id: string): Promise<AlbumResponseDto> {
+    return (await this.albumService.getById(id)).toResponse();
   }
 
   @Post()
@@ -32,8 +33,8 @@ export class AlbumController {
   @ApiResponse({ status: 201, description: 'Album is created', type: AlbumResponseDto })
   @ApiResponse({ status: 400, description: 'Bad request. body does not contain required fields' })
   @ApiBody({ type: AlbumDto })
-  creat(@Body() createAlbum: AlbumDto): Promise<AlbumResponseDto> {
-    return this.albumService.create(createAlbum);
+  async creat(@Body() createAlbum: AlbumDto): Promise<AlbumResponseDto> {
+    return (await this.albumService.create(createAlbum)).toResponse();
   }
 
   @Put(':id')
@@ -42,8 +43,8 @@ export class AlbumController {
   @ApiResponse({ status: 400, description: 'Bad request. albumId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Album was not found' })
   @ApiBody({ type: AlbumDto })
-  update(@Param('id') id: string, @Body() updateAlbum: AlbumDto): Promise<AlbumResponseDto> {
-    return this.albumService.update(id, updateAlbum);
+  async update(@Param('id') id: string, @Body() updateAlbum: AlbumDto): Promise<AlbumResponseDto> {
+    return (await this.albumService.update(id, updateAlbum)).toResponse();
   }
 
   @Delete(':id')

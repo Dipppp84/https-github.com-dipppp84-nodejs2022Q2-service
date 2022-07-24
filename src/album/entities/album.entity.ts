@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
 import { AlbumResponseDto } from '../dto/album.response.dto';
+import { getArtistId } from '../../utils/get-inner-entity-as-id';
 
 @Entity()
 export class Album {
@@ -12,11 +13,13 @@ export class Album {
   }
 
   toResponse(): AlbumResponseDto {
-    let artistId = null;
+    /*let artistId = null;
     if (typeof this.artist === 'string')
       artistId = this.artist;
     else if (this.artist instanceof Artist)
-      artistId = this.artist.id;
+      artistId = this.artist.id;*/
+
+    const artistId = getArtistId<Album>(this);
     return { id: this.id, name: this.name, year: this.year, artistId: artistId };
   }
 
