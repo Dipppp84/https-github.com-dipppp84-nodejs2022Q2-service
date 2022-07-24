@@ -6,7 +6,6 @@ import { FavoriteService } from '../favorite/favorite.service';
 import { ArtistService } from '../artist/artist.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Artist } from '../artist/entities/artist.entity';
 import { sendNotFound } from '../utils/handler-error';
 import { Album } from './entities/album.entity';
 
@@ -24,8 +23,7 @@ export class AlbumService {
   }
 
   async getAll(): Promise<Album[]> {
-    const all = await this.albumRepository.find({ loadRelationIds: true });
-    return all.map(album => album);
+    return this.albumRepository.find({ loadRelationIds: true });
   }
 
   async getById(id: string): Promise<Album> {
@@ -40,11 +38,10 @@ export class AlbumService {
   }
 
   async create({ artistId, name, year }: AlbumDto): Promise<Album> {
-    let artist: Artist = null;
     if (artistId)
-      artist = await this.artistService.getById(artistId);
+      await this.artistService.getById(artistId);
 
-    const album = new Album(name, year, artist);
+    const album = { name: name, year: year, artistId: artistId };
     return this.albumRepository.save(album);
   }
 
@@ -54,13 +51,12 @@ export class AlbumService {
     if (!album)
       sendNotFound('Id doesn\'t exist');
 
-    let artist: Artist = null;
     if (artistId)
-      artist = await this.artistService.getById(artistId);
+      await this.artistService.getById(artistId);
 
     album.name = name;
     album.year = year;
-    album.artist = artist;
+    album.artistId = artistId;
     return this.albumRepository.save(album);
   }
 

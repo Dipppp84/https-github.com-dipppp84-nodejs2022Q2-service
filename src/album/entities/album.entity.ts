@@ -1,26 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
-import { AlbumResponseDto } from '../dto/album.response.dto';
-import { getArtistId } from '../../utils/get-inner-entity-as-id';
 
 @Entity()
 export class Album {
-  constructor(name: string, year: number, artist: Artist) {
-    this.name = name;
-    this.year = year;
-    this.artist = artist;
-  }
-
-  toResponse(): AlbumResponseDto {
-    /*let artistId = null;
-    if (typeof this.artist === 'string')
-      artistId = this.artist;
-    else if (this.artist instanceof Artist)
-      artistId = this.artist.id;*/
-
-    const artistId = getArtistId<Album>(this);
-    return { id: this.id, name: this.name, year: this.year, artistId: artistId };
+  constructor(partial: Partial<Album>) {
+    Object.assign(this, partial);
   }
 
   @ApiProperty()
@@ -35,5 +20,6 @@ export class Album {
   @ApiProperty({ nullable: true })
   @ManyToOne(() => Artist, (artist: Artist) => artist.id,
     { onDelete: 'SET NULL' })
-  artist: Artist | string | null;
+  @JoinColumn({ name: 'artistId' })
+  artistId: string | null;
 }

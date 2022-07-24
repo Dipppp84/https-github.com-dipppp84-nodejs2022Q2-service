@@ -6,8 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { checkId } from '../utils/validate';
 import { sendNotFound } from '../utils/handler-error';
-import { Artist } from '../artist/entities/artist.entity';
-import { Album } from '../album/entities/album.entity';
 import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
 
@@ -24,8 +22,7 @@ export class TrackService {
   }
 
   async getAll(): Promise<Track[]> {
-    const all = await this.trackRepository.find({ loadRelationIds: true });
-    return all.map(track => track);
+    return this.trackRepository.find({ loadRelationIds: true });
   }
 
   async getById(id: string): Promise<Track> {
@@ -40,15 +37,13 @@ export class TrackService {
   }
 
   async create({ albumId, artistId, duration, name }: TrackDto): Promise<Track> {
-    let album: Album = null;
     if (albumId)
-      album = await this.albumService.getById(albumId);
+      await this.albumService.getById(albumId);
 
-    let artist: Artist = null;
     if (artistId)
-      artist = await this.artistService.getById(artistId);
+      await this.artistService.getById(artistId);
 
-    const track = new Track(name, duration, artist, album);
+    const track = { name: name, duration: duration, artistId: artistId, albumId: albumId };
     return this.trackRepository.save(track);
   }
 
@@ -58,17 +53,15 @@ export class TrackService {
     if (!track)
       sendNotFound('Id doesn\'t exist');
 
-    let album: Album = null;
     if (albumId)
-      album = await this.albumService.getById(albumId);
+      await this.albumService.getById(albumId);
 
-    let artist: Artist = null;
     if (artistId)
-      artist = await this.artistService.getById(artistId);
+      await this.artistService.getById(artistId);
 
     track.name = name;
-    track.artist = artist;
-    track.album = album;
+    track.artistId = artistId;
+    track.albumId = albumId;
     track.duration = duration;
     return this.trackRepository.save(track);
   }
@@ -78,6 +71,7 @@ export class TrackService {
     const track = await this.trackRepository.findOneBy({ id });
     if (!track)
       sendNotFound('Id doesn\'t exist');
+
     return this.trackRepository.delete(id);
   }
 }
