@@ -1,7 +1,17 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
-import { FavoriteDto } from './dto/favorite.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Favorite } from './entities/favorite.entity';
 
 @ApiTags('Favorite')
 @Controller('favs')
@@ -9,10 +19,11 @@ export class FavoriteController {
   constructor(private favoriteService: FavoriteService) {
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @ApiOperation({ summary: 'Get favorite' })
-  @ApiResponse({ status: 200, description: 'Successful operation', type: FavoriteDto })
-  getAll(): FavoriteDto {
+  @ApiResponse({ status: 200, description: 'Successful operation', type: Favorite })
+  getAll(): Promise<Favorite> {
     return this.favoriteService.getAll();
   }
 
@@ -21,8 +32,8 @@ export class FavoriteController {
   @ApiResponse({ status: 201, description: 'Added successfully' })
   @ApiResponse({ status: 400, description: 'Bad. albumId is invalid (not uuid)' })
   @ApiResponse({ status: 400, description: 'Album with id doesn\'t exist' })
-  setAlbum(@Param('id') id: string) {
-    this.favoriteService.setAlbum(id);
+  setAlbum(@Param('id') id: string): Promise<void> {
+    return this.favoriteService.setAlbum(id);
   }
 
   @Delete('/album/:id')
@@ -31,8 +42,8 @@ export class FavoriteController {
   @ApiResponse({ status: 204, description: 'Deleted successfully' })
   @ApiResponse({ status: 400, description: 'Bad request. albumId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Album was not found' })
-  removeAlbum(@Param('id') id: string) {
-    this.favoriteService.removeAlbum(id);
+  removeAlbum(@Param('id') id: string): Promise<void> {
+    return this.favoriteService.removeAlbum(id);
   }
 
   @Post('/track/:id')
@@ -40,8 +51,8 @@ export class FavoriteController {
   @ApiResponse({ status: 201, description: 'Track successfully' })
   @ApiResponse({ status: 400, description: 'Bad. trackId is invalid (not uuid)' })
   @ApiResponse({ status: 400, description: 'Track with id doesn\'t exist' })
-  setTrack(@Param('id') id: string) {
-    this.favoriteService.setTrack(id);
+  setTrack(@Param('id') id: string): Promise<void> {
+    return this.favoriteService.setTrack(id);
   }
 
   @Delete('/track/:id')
@@ -50,8 +61,8 @@ export class FavoriteController {
   @ApiResponse({ status: 204, description: 'Deleted successfully' })
   @ApiResponse({ status: 400, description: 'Bad request. trackId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Track was not found' })
-  removeTrack(@Param('id') id: string) {
-    this.favoriteService.removeTrack(id);
+  removeTrack(@Param('id') id: string): Promise<void> {
+    return this.favoriteService.removeTrack(id);
   }
 
   @Post('/artist/:id')
@@ -59,8 +70,8 @@ export class FavoriteController {
   @ApiResponse({ status: 201, description: 'Track successfully' })
   @ApiResponse({ status: 400, description: 'Bad. artistId is invalid (not uuid)' })
   @ApiResponse({ status: 400, description: 'Artist with id doesn\'t exist' })
-  setArtist(@Param('id') id: string) {
-    this.favoriteService.setArtist(id);
+  setArtist(@Param('id') id: string): Promise<void> {
+    return this.favoriteService.setArtist(id);
   }
 
   @Delete('/artist/:id')
@@ -69,7 +80,7 @@ export class FavoriteController {
   @ApiResponse({ status: 204, description: 'Deleted successfully' })
   @ApiResponse({ status: 400, description: 'Bad request. artistId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Artist was not found' })
-  removeArtist(@Param('id') id: string) {
-    this.favoriteService.removeArtist(id);
+  removeArtist(@Param('id') id: string): Promise<void> {
+    return this.favoriteService.removeArtist(id);
   }
 }

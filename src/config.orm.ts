@@ -8,7 +8,7 @@ export const config: TypeOrmModuleOptions = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  autoLoadEntities: true,//entities: [User], //['dist/**/entities/*.entity.js']
+  autoLoadEntities: true,
   retryAttempts: 3,
 
   synchronize: true,

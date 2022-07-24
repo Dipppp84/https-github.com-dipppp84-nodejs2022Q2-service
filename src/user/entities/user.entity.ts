@@ -8,14 +8,13 @@ export class User {
     Object.assign(this, partial);
   }
 
-  @ApiProperty()
+  @ApiProperty({name:'uuid'})
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @ApiProperty()
   @Column({ type: 'varchar' })
   login: string;
   @Exclude()
-  @ApiProperty()
   @Column({ type: 'varchar' })
   password: string;
   @ApiProperty()

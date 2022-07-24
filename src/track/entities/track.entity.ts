@@ -9,7 +9,7 @@ export class Track {
     Object.assign(this, partial);
   }
 
-  @ApiProperty()
+  @ApiProperty({name:'uuid'})
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @ApiProperty()
