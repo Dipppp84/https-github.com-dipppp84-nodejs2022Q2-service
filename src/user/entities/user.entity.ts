@@ -8,7 +8,7 @@ export class User {
     Object.assign(this, partial);
   }
 
-  @ApiProperty({name:'uuid'})
+  @ApiProperty({ name: 'uuid' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @ApiProperty()

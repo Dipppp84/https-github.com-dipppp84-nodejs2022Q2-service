@@ -2,7 +2,7 @@
   "name": "home-library",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Dipppp84",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -20,7 +20,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "scan:rest_service": "docker scan dipppp84/rest_service:v1",
-    "scan:db": "docker scan dipppp84/rest_db:v1"
+    "scan:db": "docker scan dipppp84/rest_db:v1",
+    "typeorm:generate": "typeorm-ts-node-esm migration:generate src/migration/migration -d src/migration.configuration.ts",
+    "typeorm:migration": "typeorm-ts-node-esm migration:run -d src/migration.configuration.ts"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
