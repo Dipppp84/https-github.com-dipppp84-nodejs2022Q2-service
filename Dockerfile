@@ -6,6 +6,4 @@ RUN npm install
 COPY . .
 COPY --chown=node:node . .
 USER node
-ENV PORT 4000
-EXPOSE $PORT
 CMD [ "npm", "run", "start:dev"]

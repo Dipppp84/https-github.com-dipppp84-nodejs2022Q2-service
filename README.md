@@ -22,7 +22,9 @@ npm install
 ```
 npm run build
 ```
-2. Run the project
+2. Need to сreate .env from .env.example
+   
+3. Run the project
 ```
 npm start
 ```
@@ -80,11 +82,11 @@ docker-compose down
 ### Running only application as docker
 To run for cmd
 ```
-docker run -p 4000:4000 -v %cd%/src:/node/app/src --rm dipppp84/rest_service:v1
+docker run -p 4000:4000 -v %cd%/src:/node/app/src --rm dipppp84/rest_service:v2
 ```
 To run for bash
 ```
-docker run -p 4000:4000 -v "$(pwd)/src:/node/app/src" --rm dipppp84/rest_service:v1
+docker run -p 4000:4000 -v "$(pwd)/src:/node/app/src" --rm dipppp84/rest_service:v2
 ```
 
 ### Running only postgres as docker

@@ -4,9 +4,11 @@ services:
 #    build:
 #      context: ./
 #      dockerfile: Dockerfile
-    image: dipppp84/rest_service:v1
+    image: dipppp84/rest_service:v2
     env_file:
       - .env
+    environment:
+      PORT: ${PORT}
     depends_on:
       - postgres
     volumes:

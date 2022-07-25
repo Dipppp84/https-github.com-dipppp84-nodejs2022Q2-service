@@ -1,4 +1,4 @@
-import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions, } from '@nestjs/typeorm';
+import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import 'dotenv/config';
 
 export const configAsync: TypeOrmModuleAsyncOptions = {
