@@ -6,15 +6,17 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Post,
+  Post, UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Favorite } from './entities/favorite.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Favorite')
 @Controller('favs')
+@UseGuards(JwtAuthGuard)
 export class FavoriteController {
   constructor(private favoriteService: FavoriteService) {
   }

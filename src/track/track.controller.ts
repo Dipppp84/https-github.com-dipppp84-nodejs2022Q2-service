@@ -1,11 +1,13 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track } from './entities/track.entity';
 import { TrackDto } from './dto/track.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Track')
 @Controller('track')
+@UseGuards(JwtAuthGuard)
 export class TrackController {
   constructor(private trackService: TrackService) {
   }
