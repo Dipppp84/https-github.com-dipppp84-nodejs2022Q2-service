@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TokenDto } from './ dto/token.dto';
 import { RequestRefreshTokenDto } from './ dto/request-refresh-token.dto';
 
@@ -48,6 +48,7 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('/refresh')
   @ApiOperation({ summary: 'Send \'login\' and \'password\' to get Access token and Refresh token' })

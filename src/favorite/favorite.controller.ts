@@ -10,10 +10,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Favorite } from './entities/favorite.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('Favorite')
 @Controller('favs')
 @UseGuards(JwtAuthGuard)

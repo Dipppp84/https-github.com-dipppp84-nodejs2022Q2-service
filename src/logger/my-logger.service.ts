@@ -58,7 +58,6 @@ export class MyLogger extends ConsoleLogger {
       this.writeableStream.write(message + '\n');
     }
   }
-
 }
 
 enum MyLogLevel {

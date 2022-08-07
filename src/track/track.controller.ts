@@ -2,9 +2,10 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, 
 import { TrackService } from './track.service';
 import { Track } from './entities/track.entity';
 import { TrackDto } from './dto/track.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('Track')
 @Controller('track')
 @UseGuards(JwtAuthGuard)
