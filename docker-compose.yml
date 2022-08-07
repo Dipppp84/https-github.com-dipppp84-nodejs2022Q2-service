@@ -1,10 +1,9 @@
 version: "3.9"
 services:
   app:
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
-    image: dipppp84/rest_service:v2
+    build:
+      context: ./
+      dockerfile: Dockerfile
     env_file:
       - .env
     environment:
@@ -21,10 +20,9 @@ services:
       - ${PORT}:${PORT}
 
   postgres:
-#    build:
-#      context: db
-#      dockerfile: Dockerfile
-    image: dipppp84/rest_db:v1
+    build:
+      context: db
+      dockerfile: Dockerfile
     env_file:
       - .env
     environment:

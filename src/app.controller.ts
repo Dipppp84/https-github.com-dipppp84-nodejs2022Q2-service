@@ -10,13 +10,6 @@ export class AppController {
 
   @Get()
   getHello(@Request() req): string {
-    console.log(req.user);
     return this.appService.getHello();
-  }
-
-  @Get('1')
-  getHello1(@Request() req): string {
-    console.log(req.user);
-    return this.appService.getHello() + '1';
   }
 }
