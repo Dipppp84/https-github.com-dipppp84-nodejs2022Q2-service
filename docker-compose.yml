@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      PORT: ${PORT}
+    depends_on:
+      - postgres
+    volumes:
+      - ./src:/node/app/src
+    networks:
+      - mynet
+    restart: always
+
+    ports:
+      - ${PORT}:${PORT}
+
+  postgres:
+    build:
+      context: db
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynet
+    restart: always
+    ports:
+      - ${PORT_DB}:${PORT_DB}
+
+networks:
+  mynet:
+    driver: bridge
+volumes:
+  pgdata:
