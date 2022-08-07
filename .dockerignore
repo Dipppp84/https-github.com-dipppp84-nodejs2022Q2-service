@@ -10,3 +10,4 @@ Dockerfile
 Makefile
 README.md
 dist
+log

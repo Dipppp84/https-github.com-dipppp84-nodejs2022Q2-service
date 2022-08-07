@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { ArtistModule } from './artist/artist.module';
 import { TrackModule } from './track/track.module';
@@ -9,6 +9,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { LoggerMiddleware } from './logger/logger.middleware';
+import { APP_FILTER } from '@nestjs/core';
+import { MyExceptionFilterLogger } from './logger/my-exception-filter.logger';
 
 @Module({
   imports: [
@@ -18,9 +21,21 @@ import { AppController } from './app.controller';
     AlbumModule,
     FavoriteModule,
     TypeOrmModule.forRootAsync(configAsync),
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: MyExceptionFilterLogger,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('*');
+  }
+}
