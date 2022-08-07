@@ -13,8 +13,8 @@ export const configAsync: TypeOrmModuleAsyncOptions = {
       autoLoadEntities: true,
       retryAttempts: 3,
       migrations: ['dist/migration/*{.ts,.js}'],
-      migrationsRun: false,//true
-      synchronize: true,//false
+      migrationsRun: true,
+      synchronize: false,
     }
   }
 }
