@@ -1,0 +1,13 @@
+db
+node_modules
+test
+package-lock.json
+.git
+.gitignore
+.idea
+docker-compose.yml
+Dockerfile
+Makefile
+README.md
+dist
+log/*

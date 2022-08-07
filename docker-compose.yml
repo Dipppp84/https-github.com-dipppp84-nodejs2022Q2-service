@@ -1,0 +1,55 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      PORT: ${PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      CRYPT_SALT: ${CRYPT_SALT}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_REFRESH_KEY: ${JWT_SECRET_REFRESH_KEY}
+      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
+      TOKEN_REFRESH_EXPIRE_TIME: ${TOKEN_REFRESH_EXPIRE_TIME}
+      LOG_TURN: ${LOG_TURN}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_MAX_SIZE=: ${LOG_MAX_SIZE}
+    depends_on:
+      - postgres
+    volumes:
+      - ./src:/node/app/src
+      - ./log:/node/app/log
+    networks:
+      - mynet
+    restart: always
+
+    ports:
+      - ${PORT}:${PORT}
+
+  postgres:
+    build:
+      context: db
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynet
+    restart: always
+    ports:
+      - ${PORT_DB}:${PORT_DB}
+
+networks:
+  mynet:
+    driver: bridge
+volumes:
+  pgdata:
