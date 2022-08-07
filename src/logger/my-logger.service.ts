@@ -4,10 +4,10 @@ import { WriteStream } from 'fs';
 import * as path from 'path';
 
 export class MyLogger extends ConsoleLogger {
-  private loggerLevel: number;
-  private logSize: number;
+  private readonly loggerLevel: number;
+  private readonly logSize: number;
   private writeableStream: WriteStream;
-  private logTurn: boolean;
+  private readonly logTurn: boolean;
 
   constructor() {
     super('MyLoggerContext', { logLevels: ['log', 'error', 'warn', 'debug', 'verbose'] });
