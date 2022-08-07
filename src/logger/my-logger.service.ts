@@ -4,20 +4,18 @@ import { WriteStream } from 'fs';
 import * as path from 'path';
 
 export class MyLogger extends ConsoleLogger {
-  loggerLevel: number;
-  logDir: string;
-  logSize: number;
-  writeableStream: WriteStream;
+  private loggerLevel: number;
+  private logSize: number;
+  private writeableStream: WriteStream;
+  private logTurn: boolean;
 
   constructor() {
     super('MyLoggerContext', { logLevels: ['log', 'error', 'warn', 'debug', 'verbose'] });
     this.loggerLevel = Number(process.env.LOG_LEVEL) || 0;
-    if (Boolean(process.env.LOG_TURN)) {
-      this.logDir = process.env.LOG_DIR || './log';
+    this.logTurn = Boolean(process.env.LOG_TURN);
+    if (this.logTurn) {
       this.logSize = Number(process.env.LOG_MAX_SIZE) * 1024;
-      if (!fs.existsSync(this.logDir))
-        fs.mkdirSync(this.logDir);
-      this.writeableStream = fs.createWriteStream(path.join(this.logDir, 'log-' + new Date().getTime()) + '.txt', { flags: 'a+' });
+      this.writeableStream = fs.createWriteStream(path.join('.', 'log', 'log-' + new Date().getTime()) + '.txt', { flags: 'a+' });
     }
   }
 
@@ -27,7 +25,7 @@ export class MyLogger extends ConsoleLogger {
 
   error(message: string, stack?: string, context?: string) {
     if (this.loggerLevel >= MyLogLevel.ERROR)
-      super.error(message, stack, context);
+      super.error(message);
   }
 
   warn(message: any, ...optionalParams) {
@@ -47,7 +45,7 @@ export class MyLogger extends ConsoleLogger {
 
 
   protected printMessages(messages: string[], context?: string, logLevel?: LogLevel, writeStreamType?: 'stdout' | 'stderr') {
-    if (context === 'MyLoggerContext') {
+    if (this.logTurn && context === 'MyLoggerContext') {
       this.writeInLogFile(`Time: ${new Date().toLocaleString()} [${logLevel.toUpperCase()}] ${messages[0]}`);
     }
     super.printMessages(messages, context, logLevel, writeStreamType);
@@ -56,7 +54,7 @@ export class MyLogger extends ConsoleLogger {
   private writeInLogFile(message: string): void {
     if (this.writeableStream) {
       if (this.writeableStream.bytesWritten > this.logSize)
-        this.writeableStream = fs.createWriteStream(path.join(this.logDir, 'log-' + new Date().getTime()) + '.txt', { flags: 'a+' });
+        this.writeableStream = fs.createWriteStream(path.join('.', 'log', 'log-' + new Date().getTime()) + '.txt', { flags: 'a+' });
       this.writeableStream.write(message + '\n');
     }
   }
